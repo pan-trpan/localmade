@@ -15,7 +15,7 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
     body {
-      background: linear-gradient(135deg, #0b0f1a 0%, #1a1040 50%, #0d1f2d 100%);
+      background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -418,26 +418,10 @@
       border-color: #b9c8f055;
     }
 
-    /* Color badge - for ကာလာ */
-    .color-badge {
-      display: inline-block;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
-      vertical-align: middle;
-      margin-right: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      transition: 0.3s ease;
-    }
-    .color-badge:hover {
-      transform: scale(1.2);
-      border-color: #f5b81b;
-    }
+    /* Color text only - no dot */
     .color-text {
       font-size: 0.8rem;
       color: #e4e9f2;
-      vertical-align: middle;
     }
 
     /* ===== DETAIL DIALOG (SMOOTH + SCROLL) ===== */
@@ -580,17 +564,6 @@
     .dialog-info .full-row {
       grid-column: 1 / -1;
     }
-    .dialog-color-preview {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .dialog-color-preview .color-badge {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
-    }
 
     /* ===== FOOTER ===== */
     .page-footer {
@@ -620,7 +593,7 @@
     @media (max-width: 768px) {
       body { 
         padding: 0.5rem;
-        background: linear-gradient(135deg, #0b0f1a 0%, #1a1040 60%, #0d1f2d 100%);
+        background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
       }
       .card { padding: 0.8rem; border-radius: 1.2rem; }
       .neon-blink { font-size: 1.3rem; letter-spacing: 1px; gap: 0.3rem; margin-bottom: 0.8rem; }
@@ -825,7 +798,7 @@
         </div>
         <div>
           <span class="label">ကာလာ</span>
-          <div class="value dialog-color-preview" id="dialogColor"></div>
+          <div class="value" id="dialogColor"></div>
         </div>
         <div>
           <span class="label">barcode</span>
@@ -854,35 +827,35 @@
 
 <script>
   (function() {
-    // ----- DATA (with Gender & Color) -----
+    // ----- DATA (with Gender & Color - text only) -----
     const products = [
       { id: 1, col1: "ရှပ်အင်္ကျီ", col2: "ကော်ပြန့်", barcode: "2026-001", price: 18500, 
         image: "https://picsum.photos/id/1/400/400", stock: 12, available: true, dateAdded: "2026-01-15", 
-        gender: "male", color: "#2c3e50", colorName: "အနက်ပြာ" },
+        gender: "male", colorName: "အနက်ပြာ" },
       { id: 2, col1: "အင်္ကျီတို", col2: "ပိတ်ချော", barcode: "2026-002", price: 22000, 
         image: "https://picsum.photos/id/21/400/400", stock: 5, available: true, dateAdded: "2026-01-05", 
-        gender: "female", color: "#e74c3c", colorName: "အနီ" },
+        gender: "female", colorName: "အနီ" },
       { id: 3, col1: "ဂျင်းဘောင်းဘီ", col2: "အပြာရောင်", barcode: "2026-003", price: 32000, 
         image: "https://picsum.photos/id/26/400/400", stock: 0, available: false, dateAdded: "2026-01-28", 
-        gender: "unisex", color: "#2980b9", colorName: "အပြာ" },
+        gender: "unisex", colorName: "အပြာ" },
       { id: 4, col1: "အားကစားဝတ်စုံ", col2: "အနက်ရောင်", barcode: "2026-004", price: 27500, 
         image: "https://picsum.photos/id/48/400/400", stock: 8, available: true, dateAdded: "2026-02-01", 
-        gender: "unisex", color: "#1a1a2e", colorName: "အနက်" },
+        gender: "unisex", colorName: "အနက်" },
       { id: 5, col1: "အင်္ကျီရှည်", col2: "ခရင်မ်", barcode: "2026-005", price: 19800, 
         image: "https://picsum.photos/id/55/400/400", stock: 2, available: true, dateAdded: "2026-01-20", 
-        gender: "female", color: "#f5e6ca", colorName: "ခရင်မ်" },
+        gender: "female", colorName: "ခရင်မ်" },
       { id: 6, col1: "အင်္ကျီလက်တို", col2: "ပန်းရောင်", barcode: "2026-006", price: 16200, 
         image: "https://picsum.photos/id/64/400/400", stock: 0, available: false, dateAdded: "2026-01-25", 
-        gender: "female", color: "#ff6b8a", colorName: "ပန်းရောင်" },
+        gender: "female", colorName: "ပန်းရောင်" },
       { id: 7, col1: "အင်္ကျီအိတ်", col2: "အဖြူ", barcode: "2026-007", price: 9500, 
         image: "https://picsum.photos/id/77/400/400", stock: 15, available: true, dateAdded: "2026-01-10", 
-        gender: "male", color: "#ffffff", colorName: "အဖြူ" },
+        gender: "male", colorName: "အဖြူ" },
       { id: 8, col1: "ဘောင်းဘီတို", col2: "ကြက်ခြေ", barcode: "2026-008", price: 18900, 
         image: "https://picsum.photos/id/88/400/400", stock: 3, available: true, dateAdded: "2026-02-01", 
-        gender: "male", color: "#8b4513", colorName: "အညို" },
+        gender: "male", colorName: "အညို" },
       { id: 9, col1: "အင်္ကျီလုံ", col2: "အနီ", barcode: "2026-009", price: 21200, 
         image: "https://picsum.photos/id/99/400/400", stock: 0, available: false, dateAdded: "2026-01-01", 
-        gender: "unisex", color: "#c0392b", colorName: "အနီရင့်" },
+        gender: "unisex", colorName: "အနီရင့်" },
     ];
 
     // Helper: get gender display
@@ -899,11 +872,6 @@
       if (gender === 'male') return 'gender-badge male';
       if (gender === 'female') return 'gender-badge female';
       return 'gender-badge unisex';
-    }
-
-    // Helper: get color display
-    function getColorDisplay(color, colorName) {
-      return `<span class="color-badge" style="background:${color};"></span><span class="color-text">${colorName}</span>`;
     }
 
     // ----- RENDER -----
@@ -930,7 +898,7 @@
               <span class="${getGenderClass(p.gender)}">${getGenderDisplay(p.gender)}</span>
             </td>
             <td data-label="ကာလာ" class="clickable-cell" data-field="color">
-              ${getColorDisplay(p.color, p.colorName)}
+              <span class="color-text">${p.colorName}</span>
             </td>
             <td data-label="barcode" class="clickable-cell" data-field="barcode">
               <span class="barcode">${p.barcode}</span>
@@ -984,11 +952,7 @@
       dialogImg.alt = product.col1;
       dialogName.innerHTML = `${product.col1} <span style="color:#a0acc9;font-size:0.9rem;font-weight:400;">${product.col2}</span>`;
       dialogGender.innerHTML = getGenderDisplay(product.gender);
-      dialogColor.innerHTML = `
-        <span class="color-badge" style="background:${product.color}; width:40px; height:40px;"></span>
-        <span style="font-size:1.1rem;">${product.colorName}</span>
-        <span style="color:#6a7a9a; font-size:0.8rem; margin-left:4px;">(${product.color})</span>
-      `;
+      dialogColor.textContent = product.colorName;
       dialogBarcode.textContent = product.barcode;
       dialogPrice.textContent = `${product.price.toLocaleString('my-MM')} Ks`;
       dialogStock.textContent = product.stock === 0 ? 'Out of Stock (Shopping)' : `${product.stock} left`;
@@ -1000,7 +964,6 @@
       dialog.classList.add('active');
       document.body.style.overflow = 'hidden';
       
-      // Scroll to top of dialog content when opened
       const scrollContent = document.querySelector('.dialog-scroll-content');
       if (scrollContent) scrollContent.scrollTop = 0;
     }
@@ -1127,8 +1090,8 @@
     sortByDate();
     setActiveButton('sortDateBtn');
 
-    console.log('✅ Dialog box: smooth animation + scroll view added!');
-    console.log('✅ Background color changed to gradient!');
+    console.log('✅ Color dot and code removed from UI!');
+    console.log('✅ Background changed to trendy online shop gradient!');
   })();
 </script>
 </body>
