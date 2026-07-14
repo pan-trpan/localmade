@@ -158,7 +158,7 @@
       color: #f5e97b;
     }
 
-    /* ===== DROPDOWN MENU (FIXED - no rotation by default) ===== */
+    /* ===== DROPDOWN MENU ===== */
     .menu-dropdown-wrapper {
       position: relative;
       display: inline-block;
@@ -391,7 +391,7 @@
       margin-left: 0.3rem;
     }
 
-    /* Gender badge styling */
+    /* Gender badge */
     .gender-badge {
       display: inline-flex;
       align-items: center;
@@ -414,6 +414,28 @@
     .gender-badge.unisex {
       color: #b9c8f0;
       border-color: #b9c8f055;
+    }
+
+    /* Color badge - for ကာလာ */
+    .color-badge {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      vertical-align: middle;
+      margin-right: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: 0.3s ease;
+    }
+    .color-badge:hover {
+      transform: scale(1.2);
+      border-color: #f5b81b;
+    }
+    .color-text {
+      font-size: 0.8rem;
+      color: #e4e9f2;
+      vertical-align: middle;
     }
 
     /* ===== DETAIL DIALOG ===== */
@@ -517,6 +539,17 @@
     }
     .dialog-info .full-row {
       grid-column: 1 / -1;
+    }
+    .dialog-color-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dialog-color-preview .color-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
     }
 
     /* ===== FOOTER ===== */
@@ -684,7 +717,7 @@
           <i class="fas fa-bars"></i>
         </button>
         <div class="menu-dropdown-content" id="menuDropdownContent">
-          <a href="#" class="active-drop-item"><i class="fas fa-tshirt"></i> 2026</a>
+          <a href="#" class="active-drop-item"><i class="fas fa-tshirt"></i> Collection 2026</a>
           <a href="https://www.google.com" target="_blank"><i class="fas fa-info-circle"></i> About</a>
           <a href="https://www.google.com" target="_blank"><i class="fas fa-code"></i> Web Building</a>
           <a href="https://www.google.com" target="_blank"><i class="fas fa-gamepad"></i> Online Game Selling</a>
@@ -704,6 +737,7 @@
         <tr>
           <th>အထည်အမျိုးအစား</th>
           <th>ကျား/မ</th>
+          <th>ကာလာ</th>
           <th>barcode</th>
           <th>ဈေးနှုန်း</th>
           <th>Image / Stock</th>
@@ -737,6 +771,10 @@
         <div class="value" id="dialogGender"></div>
       </div>
       <div>
+        <span class="label">ကာလာ</span>
+        <div class="value dialog-color-preview" id="dialogColor"></div>
+      </div>
+      <div>
         <span class="label">barcode</span>
         <div class="value" id="dialogBarcode" style="font-family:'Courier New',monospace;"></div>
       </div>
@@ -762,27 +800,36 @@
 
 <script>
   (function() {
-    // ----- DATA (with Gender) -----
-    // gender: 'male', 'female', 'unisex'
+    // ----- DATA (with Gender & Color) -----
+    // colors: color name and hex code
     const products = [
-      { id: 1, col1: "ရှပ်အင်္ကျီ", col2: "ကော်ပြန့်", barcode: "COLP2026-001", price: 18500, 
-        image: "https://picsum.photos/id/1/400/400", stock: 12, available: true, dateAdded: "2026-01-15", gender: "male" },
-      { id: 2, col1: "အင်္ကျီတို", col2: "ပိတ်ချော", barcode: "COLP2026-002", price: 22000, 
-        image: "https://picsum.photos/id/21/400/400", stock: 5, available: true, dateAdded: "2026-01-05", gender: "female" },
-      { id: 3, col1: "ဂျင်းဘောင်းဘီ", col2: "အပြာရောင်", barcode: "COLP2026-003", price: 32000, 
-        image: "https://picsum.photos/id/26/400/400", stock: 0, available: false, dateAdded: "2026-01-28", gender: "unisex" },
-      { id: 4, col1: "အားကစားဝတ်စုံ", col2: "အနက်ရောင်", barcode: "COLP2026-004", price: 27500, 
-        image: "https://picsum.photos/id/48/400/400", stock: 8, available: true, dateAdded: "2026-02-01", gender: "unisex" },
-      { id: 5, col1: "အင်္ကျီရှည်", col2: "ခရင်မ်", barcode: "COLP2026-005", price: 19800, 
-        image: "https://picsum.photos/id/55/400/400", stock: 2, available: true, dateAdded: "2026-01-20", gender: "female" },
-      { id: 6, col1: "အင်္ကျီလက်တို", col2: "ပန်းရောင်", barcode: "COLP2026-006", price: 16200, 
-        image: "https://picsum.photos/id/64/400/400", stock: 0, available: false, dateAdded: "2026-01-25", gender: "female" },
-      { id: 7, col1: "အင်္ကျီအိတ်", col2: "အဖြူ", barcode: "COLP2026-007", price: 9500, 
-        image: "https://picsum.photos/id/77/400/400", stock: 15, available: true, dateAdded: "2026-01-10", gender: "male" },
-      { id: 8, col1: "ဘောင်းဘီတို", col2: "ကြက်ခြေ", barcode: "COLP2026-008", price: 18900, 
-        image: "https://picsum.photos/id/88/400/400", stock: 3, available: true, dateAdded: "2026-02-01", gender: "male" },
-      { id: 9, col1: "အင်္ကျီလုံ", col2: "အနီ", barcode: "COLP2026-009", price: 21200, 
-        image: "https://picsum.photos/id/99/400/400", stock: 0, available: false, dateAdded: "2026-01-01", gender: "unisex" },
+      { id: 1, col1: "ရှပ်အင်္ကျီ", col2: "ကော်ပြန့်", barcode: "2026-001", price: 18500, 
+        image: "https://picsum.photos/id/1/400/400", stock: 12, available: true, dateAdded: "2026-01-15", 
+        gender: "male", color: "#2c3e50", colorName: "အနက်ပြာ" },
+      { id: 2, col1: "အင်္ကျီတို", col2: "ပိတ်ချော", barcode: "2026-002", price: 22000, 
+        image: "https://picsum.photos/id/21/400/400", stock: 5, available: true, dateAdded: "2026-01-05", 
+        gender: "female", color: "#e74c3c", colorName: "အနီ" },
+      { id: 3, col1: "ဂျင်းဘောင်းဘီ", col2: "အပြာရောင်", barcode: "2026-003", price: 32000, 
+        image: "https://picsum.photos/id/26/400/400", stock: 0, available: false, dateAdded: "2026-01-28", 
+        gender: "unisex", color: "#2980b9", colorName: "အပြာ" },
+      { id: 4, col1: "အားကစားဝတ်စုံ", col2: "အနက်ရောင်", barcode: "2026-004", price: 27500, 
+        image: "https://picsum.photos/id/48/400/400", stock: 8, available: true, dateAdded: "2026-02-01", 
+        gender: "unisex", color: "#1a1a2e", colorName: "အနက်" },
+      { id: 5, col1: "အင်္ကျီရှည်", col2: "ခရင်မ်", barcode: "2026-005", price: 19800, 
+        image: "https://picsum.photos/id/55/400/400", stock: 2, available: true, dateAdded: "2026-01-20", 
+        gender: "female", color: "#f5e6ca", colorName: "ခရင်မ်" },
+      { id: 6, col1: "အင်္ကျီလက်တို", col2: "ပန်းရောင်", barcode: "2026-006", price: 16200, 
+        image: "https://picsum.photos/id/64/400/400", stock: 0, available: false, dateAdded: "2026-01-25", 
+        gender: "female", color: "#ff6b8a", colorName: "ပန်းရောင်" },
+      { id: 7, col1: "အင်္ကျီအိတ်", col2: "အဖြူ", barcode: "2026-007", price: 9500, 
+        image: "https://picsum.photos/id/77/400/400", stock: 15, available: true, dateAdded: "2026-01-10", 
+        gender: "male", color: "#ffffff", colorName: "အဖြူ" },
+      { id: 8, col1: "ဘောင်းဘီတို", col2: "ကြက်ခြေ", barcode: "2026-008", price: 18900, 
+        image: "https://picsum.photos/id/88/400/400", stock: 3, available: true, dateAdded: "2026-02-01", 
+        gender: "male", color: "#8b4513", colorName: "အညို" },
+      { id: 9, col1: "အင်္ကျီလုံ", col2: "အနီ", barcode: "2026-009", price: 21200, 
+        image: "https://picsum.photos/id/99/400/400", stock: 0, available: false, dateAdded: "2026-01-01", 
+        gender: "unisex", color: "#c0392b", colorName: "အနီရင့်" },
     ];
 
     // Helper: get gender display
@@ -799,6 +846,11 @@
       if (gender === 'male') return 'gender-badge male';
       if (gender === 'female') return 'gender-badge female';
       return 'gender-badge unisex';
+    }
+
+    // Helper: get color display
+    function getColorDisplay(color, colorName) {
+      return `<span class="color-badge" style="background:${color};"></span><span class="color-text">${colorName}</span>`;
     }
 
     // ----- RENDER -----
@@ -823,6 +875,9 @@
             </td>
             <td data-label="ကျား/မ" class="clickable-cell" data-field="gender">
               <span class="${getGenderClass(p.gender)}">${getGenderDisplay(p.gender)}</span>
+            </td>
+            <td data-label="ကာလာ" class="clickable-cell" data-field="color">
+              ${getColorDisplay(p.color, p.colorName)}
             </td>
             <td data-label="barcode" class="clickable-cell" data-field="barcode">
               <span class="barcode">${p.barcode}</span>
@@ -864,6 +919,7 @@
     const dialogImg = document.getElementById('dialogImage');
     const dialogName = document.getElementById('dialogName');
     const dialogGender = document.getElementById('dialogGender');
+    const dialogColor = document.getElementById('dialogColor');
     const dialogBarcode = document.getElementById('dialogBarcode');
     const dialogPrice = document.getElementById('dialogPrice');
     const dialogStock = document.getElementById('dialogStock');
@@ -875,6 +931,11 @@
       dialogImg.alt = product.col1;
       dialogName.innerHTML = `${product.col1} <span style="color:#a0acc9;font-size:0.9rem;font-weight:400;">${product.col2}</span>`;
       dialogGender.innerHTML = getGenderDisplay(product.gender);
+      dialogColor.innerHTML = `
+        <span class="color-badge" style="background:${product.color}; width:40px; height:40px;"></span>
+        <span style="font-size:1.1rem;">${product.colorName}</span>
+        <span style="color:#6a7a9a; font-size:0.8rem; margin-left:4px;">(${product.color})</span>
+      `;
       dialogBarcode.textContent = product.barcode;
       dialogPrice.textContent = `${product.price.toLocaleString('my-MM')} Ks`;
       dialogStock.textContent = product.stock === 0 ? 'Out of Stock (Shopping)' : `${product.stock} left`;
@@ -982,7 +1043,8 @@
       const filtered = products.filter(p => 
         p.col1.toLowerCase().includes(q) || 
         p.col2.toLowerCase().includes(q) || 
-        p.barcode.toLowerCase().includes(q)
+        p.barcode.toLowerCase().includes(q) ||
+        p.colorName.toLowerCase().includes(q)
       );
       if (sortMode === 'date') {
         filtered.sort((a, b) => {
@@ -1008,7 +1070,7 @@
     sortByDate();
     setActiveButton('sortDateBtn');
 
-    console.log('✅ Gender column added: ကျား/မ');
+    console.log('✅ Color (ကာလာ) column added!');
   })();
 </script>
 </body>
