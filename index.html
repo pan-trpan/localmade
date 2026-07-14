@@ -182,7 +182,6 @@
       border-color: #f5b81b;
       color: #f5e97b;
     }
-    /* Icon: no rotation by default, only scale on hover */
     .menu-dropdown-btn i {
       font-size: 0.85rem;
       color: #f5b81b;
@@ -192,7 +191,6 @@
     .menu-dropdown-btn:hover i {
       transform: scale(1.2);
     }
-    /* When dropdown is open, slight rotation but returns to normal when closed */
     .menu-dropdown-btn.open i {
       transform: rotate(90deg) scale(1.1);
     }
@@ -391,6 +389,31 @@
       font-size: 0.6rem;
       color: #6a7a9a;
       margin-left: 0.3rem;
+    }
+
+    /* Gender badge styling */
+    .gender-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #0f1625;
+      border: 1px solid #2d384f;
+    }
+    .gender-badge.male {
+      color: #6bb3f0;
+      border-color: #6bb3f055;
+    }
+    .gender-badge.female {
+      color: #f06b8a;
+      border-color: #f06b8a55;
+    }
+    .gender-badge.unisex {
+      color: #b9c8f0;
+      border-color: #b9c8f055;
     }
 
     /* ===== DETAIL DIALOG ===== */
@@ -655,7 +678,7 @@
       <button id="sortStockBtn"><i class="fas fa-clock"></i> Old Stock</button>
       <button id="resetSortBtn"><i class="fas fa-list"></i> All List</button>
       
-      <!-- ===== DROPDOWN MENU (FIXED - icon returns to normal) ===== -->
+      <!-- ===== DROPDOWN MENU ===== -->
       <div class="menu-dropdown-wrapper">
         <button class="menu-dropdown-btn" id="menuDropdownBtn">
           <i class="fas fa-bars"></i>
@@ -680,6 +703,7 @@
       <thead>
         <tr>
           <th>အထည်အမျိုးအစား</th>
+          <th>ကျား/မ</th>
           <th>barcode</th>
           <th>ဈေးနှုန်း</th>
           <th>Image / Stock</th>
@@ -709,5 +733,283 @@
         <div class="value" id="dialogName" style="font-size:1.2rem; font-weight:600;"></div>
       </div>
       <div>
+        <span class="label">ကျား/မ</span>
+        <div class="value" id="dialogGender"></div>
+      </div>
+      <div>
         <span class="label">barcode</span>
-        <div class="value" id="dialogBarcode" style="font-family:'Courier New',monospace;"><
+        <div class="value" id="dialogBarcode" style="font-family:'Courier New',monospace;"></div>
+      </div>
+      <div>
+        <span class="label">ဈေးနှုန်း</span>
+        <div class="value price" id="dialogPrice"></div>
+      </div>
+      <div>
+        <span class="label">Stock</span>
+        <div class="value" id="dialogStock"></div>
+      </div>
+      <div>
+        <span class="label">Status</span>
+        <div class="value" id="dialogStatus"></div>
+      </div>
+      <div>
+        <span class="label">Added Date</span>
+        <div class="value" id="dialogDate"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- DATA (with Gender) -----
+    // gender: 'male', 'female', 'unisex'
+    const products = [
+      { id: 1, col1: "ရှပ်အင်္ကျီ", col2: "ကော်ပြန့်", barcode: "COLP2026-001", price: 18500, 
+        image: "https://picsum.photos/id/1/400/400", stock: 12, available: true, dateAdded: "2026-01-15", gender: "male" },
+      { id: 2, col1: "အင်္ကျီတို", col2: "ပိတ်ချော", barcode: "COLP2026-002", price: 22000, 
+        image: "https://picsum.photos/id/21/400/400", stock: 5, available: true, dateAdded: "2026-01-05", gender: "female" },
+      { id: 3, col1: "ဂျင်းဘောင်းဘီ", col2: "အပြာရောင်", barcode: "COLP2026-003", price: 32000, 
+        image: "https://picsum.photos/id/26/400/400", stock: 0, available: false, dateAdded: "2026-01-28", gender: "unisex" },
+      { id: 4, col1: "အားကစားဝတ်စုံ", col2: "အနက်ရောင်", barcode: "COLP2026-004", price: 27500, 
+        image: "https://picsum.photos/id/48/400/400", stock: 8, available: true, dateAdded: "2026-02-01", gender: "unisex" },
+      { id: 5, col1: "အင်္ကျီရှည်", col2: "ခရင်မ်", barcode: "COLP2026-005", price: 19800, 
+        image: "https://picsum.photos/id/55/400/400", stock: 2, available: true, dateAdded: "2026-01-20", gender: "female" },
+      { id: 6, col1: "အင်္ကျီလက်တို", col2: "ပန်းရောင်", barcode: "COLP2026-006", price: 16200, 
+        image: "https://picsum.photos/id/64/400/400", stock: 0, available: false, dateAdded: "2026-01-25", gender: "female" },
+      { id: 7, col1: "အင်္ကျီအိတ်", col2: "အဖြူ", barcode: "COLP2026-007", price: 9500, 
+        image: "https://picsum.photos/id/77/400/400", stock: 15, available: true, dateAdded: "2026-01-10", gender: "male" },
+      { id: 8, col1: "ဘောင်းဘီတို", col2: "ကြက်ခြေ", barcode: "COLP2026-008", price: 18900, 
+        image: "https://picsum.photos/id/88/400/400", stock: 3, available: true, dateAdded: "2026-02-01", gender: "male" },
+      { id: 9, col1: "အင်္ကျီလုံ", col2: "အနီ", barcode: "COLP2026-009", price: 21200, 
+        image: "https://picsum.photos/id/99/400/400", stock: 0, available: false, dateAdded: "2026-01-01", gender: "unisex" },
+    ];
+
+    // Helper: get gender display
+    function getGenderDisplay(gender) {
+      const map = {
+        'male': '<i class="fas fa-mars"></i> ကျား',
+        'female': '<i class="fas fa-venus"></i> မ',
+        'unisex': '<i class="fas fa-genderless"></i> ကျား/မ'
+      };
+      return map[gender] || gender;
+    }
+
+    function getGenderClass(gender) {
+      if (gender === 'male') return 'gender-badge male';
+      if (gender === 'female') return 'gender-badge female';
+      return 'gender-badge unisex';
+    }
+
+    // ----- RENDER -----
+    const tbody = document.getElementById('productTableBody');
+    const totalSpan = document.getElementById('totalCount');
+    let currentData = [...products];
+    let sortMode = 'date';
+
+    function renderTable(data) {
+      let html = '';
+      let availableCount = 0;
+      data.forEach(p => {
+        if (p.available) availableCount++;
+        const stockLabel = p.stock === 0 ? 'Shopping' : `${p.stock} left`;
+        const availClass = p.available ? 'available-green' : 'available-red';
+        const availText = p.available ? '✓ In Stock' : '✕ Out of Stock';
+
+        html += `
+          <tr data-id="${p.id}">
+            <td data-label="အထည်" class="clickable-cell" data-field="name">
+              <span class="product-name">${p.col1} <span class="sub-text">${p.col2}</span></span>
+            </td>
+            <td data-label="ကျား/မ" class="clickable-cell" data-field="gender">
+              <span class="${getGenderClass(p.gender)}">${getGenderDisplay(p.gender)}</span>
+            </td>
+            <td data-label="barcode" class="clickable-cell" data-field="barcode">
+              <span class="barcode">${p.barcode}</span>
+            </td>
+            <td data-label="ဈေးနှုန်း" class="clickable-cell" data-field="price">
+              <span class="price-single">${p.price.toLocaleString('my-MM')} Ks</span>
+            </td>
+            <td data-label="Image / Stock" class="clickable-cell" data-field="image">
+              <div class="product-img-wrapper">
+                <img src="${p.image}" alt="${p.col1}" loading="lazy">
+                <div>
+                  <span class="stock-badge ${availClass}"><i class="fas ${p.available ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${availText}</span>
+                  <span class="stock-badge"><i class="fas fa-boxes"></i> ${stockLabel}</span>
+                  <span class="click-hint"><i class="fas fa-hand-pointer"></i> click</span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+      totalSpan.textContent = availableCount;
+      
+      document.querySelectorAll('.clickable-cell').forEach(cell => {
+        cell.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const row = this.closest('tr');
+          if (!row) return;
+          const id = parseInt(row.dataset.id);
+          const product = currentData.find(p => p.id === id);
+          if (product) openDialog(product);
+        });
+      });
+    }
+
+    // ----- DIALOG -----
+    const dialog = document.getElementById('detailDialog');
+    const dialogClose = document.getElementById('dialogCloseBtn');
+    const dialogImg = document.getElementById('dialogImage');
+    const dialogName = document.getElementById('dialogName');
+    const dialogGender = document.getElementById('dialogGender');
+    const dialogBarcode = document.getElementById('dialogBarcode');
+    const dialogPrice = document.getElementById('dialogPrice');
+    const dialogStock = document.getElementById('dialogStock');
+    const dialogStatus = document.getElementById('dialogStatus');
+    const dialogDate = document.getElementById('dialogDate');
+
+    function openDialog(product) {
+      dialogImg.src = product.image;
+      dialogImg.alt = product.col1;
+      dialogName.innerHTML = `${product.col1} <span style="color:#a0acc9;font-size:0.9rem;font-weight:400;">${product.col2}</span>`;
+      dialogGender.innerHTML = getGenderDisplay(product.gender);
+      dialogBarcode.textContent = product.barcode;
+      dialogPrice.textContent = `${product.price.toLocaleString('my-MM')} Ks`;
+      dialogStock.textContent = product.stock === 0 ? 'Out of Stock (Shopping)' : `${product.stock} left`;
+      dialogStatus.innerHTML = product.available 
+        ? '<span style="color:#7bda7b;"><i class="fas fa-check-circle"></i> In Stock</span>' 
+        : '<span style="color:#f77b7b;"><i class="fas fa-times-circle"></i> Out of Stock</span>';
+      dialogDate.textContent = new Date(product.dateAdded).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      
+      dialog.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDialog() {
+      dialog.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    dialogClose.addEventListener('click', closeDialog);
+    dialog.addEventListener('click', function(e) {
+      if (e.target === this) closeDialog();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDialog();
+    });
+
+    // ===== DROPDOWN MENU TOGGLE =====
+    const menuBtn = document.getElementById('menuDropdownBtn');
+    const menuContent = document.getElementById('menuDropdownContent');
+    
+    menuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isOpen = menuContent.classList.contains('show');
+      
+      if (isOpen) {
+        menuContent.classList.remove('show');
+        menuBtn.classList.remove('open');
+      } else {
+        menuContent.classList.add('show');
+        menuBtn.classList.add('open');
+      }
+    });
+    
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.menu-dropdown-wrapper')) {
+        menuContent.classList.remove('show');
+        menuBtn.classList.remove('open');
+      }
+    });
+    
+    menuContent.querySelectorAll('a').forEach(item => {
+      item.addEventListener('click', function(e) {
+        menuContent.querySelectorAll('a').forEach(a => a.classList.remove('active-drop-item'));
+        this.classList.add('active-drop-item');
+        menuContent.classList.remove('show');
+        menuBtn.classList.remove('open');
+      });
+    });
+
+    // ----- SORT FUNCTIONS -----
+    function sortByDate() {
+      currentData.sort((a, b) => {
+        const dateA = new Date(a.dateAdded);
+        const dateB = new Date(b.dateAdded);
+        if (dateA.getTime() !== dateB.getTime()) {
+          return dateB.getTime() - dateA.getTime();
+        }
+        return b.id - a.id;
+      });
+      renderTable(currentData);
+      setActiveButton('sortDateBtn');
+      sortMode = 'date';
+    }
+    
+    function sortByStock() {
+      currentData.sort((a, b) => a.stock - b.stock);
+      renderTable(currentData);
+      setActiveButton('sortStockBtn');
+      sortMode = 'stock';
+    }
+    
+    function resetSort() {
+      currentData = [...products];
+      renderTable(currentData);
+      setActiveButton('resetSortBtn');
+      sortMode = 'default';
+    }
+    
+    function setActiveButton(id) {
+      document.querySelectorAll('.sort-group button:not(.menu-dropdown-btn)').forEach(btn => btn.classList.remove('active-sort'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active-sort');
+    }
+
+    // ----- SEARCH -----
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      if (q === '') {
+        currentData = [...products];
+        if (sortMode === 'date') sortByDate();
+        else if (sortMode === 'stock') sortByStock();
+        else renderTable(currentData);
+        return;
+      }
+      const filtered = products.filter(p => 
+        p.col1.toLowerCase().includes(q) || 
+        p.col2.toLowerCase().includes(q) || 
+        p.barcode.toLowerCase().includes(q)
+      );
+      if (sortMode === 'date') {
+        filtered.sort((a, b) => {
+          const dateA = new Date(a.dateAdded);
+          const dateB = new Date(b.dateAdded);
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateB.getTime() - dateA.getTime();
+          }
+          return b.id - a.id;
+        });
+      } else if (sortMode === 'stock') {
+        filtered.sort((a, b) => a.stock - b.stock);
+      }
+      renderTable(filtered);
+    });
+
+    // ----- INIT -----
+    document.getElementById('sortDateBtn').addEventListener('click', sortByDate);
+    document.getElementById('sortStockBtn').addEventListener('click', sortByStock);
+    document.getElementById('resetSortBtn').addEventListener('click', resetSort);
+
+    currentData = [...products];
+    sortByDate();
+    setActiveButton('sortDateBtn');
+
+    console.log('✅ Gender column added: ကျား/မ');
+  })();
+</script>
+</body>
+</html>
